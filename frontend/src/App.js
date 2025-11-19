@@ -4,18 +4,22 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Home from "./pages/home";
+import UserProvider from "./context/userContext";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
+import Dashboard from "./pages/dashboard";
 function App() {
   return (
+    <UserProvider>
     <Router>
         <Routes>
           <Route path="/" element={<Login/>} />
           <Route path="/login" exact element={<Login />} />
           <Route path="/signup" exact element={<Signup />} />
+          <Route path="/dashboard" exact element={<Dashboard />} />
         </Routes>
     </Router>
+    </UserProvider>
   );
 }
 

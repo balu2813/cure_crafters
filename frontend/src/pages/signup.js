@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link,useNavigate } from "react-router-dom";
+import axios from "axios";
+import { UserContext } from "../context/userContext";
 
 export default function Signup() {
   const [form, setForm] = useState({
@@ -7,44 +9,57 @@ export default function Signup() {
     email: "",
     password: ""
   });
-
+  
+  const {updateUser} = useContext(UserContext);
   const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const signup = async () => {
+    try {
+      const res = await axios.post("http://localhost:8000/api/auth/signup", {
+        fullName: form.name,
+        email: form.email,
+        password: form.password
+      });
+
+      const { token, user } = res.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        updateUser(user);
+        navigate("/dashboard");
+      }
+
+    } catch (error) {
+      console.error("POST Error:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Signup failed");
+    }
+  };
+
   const validate = () => {
     const newErrors = {};
 
-    if (!form.name.trim()) {
-      newErrors.name = "Full name is required";
-    } else if (form.name.length < 3) {
-      newErrors.name = "Name must be at least 3 characters";
-    }
-
-    if (!form.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = "Enter a valid email address";
-    }
-
-    if (!form.password.trim()) {
-      newErrors.password = "Password is required";
-    } else if (form.password.length < 6) {
+    if (!form.name.trim()) newErrors.name = "Full name is required";
+    if (!form.email.trim()) newErrors.email = "Email is required";
+    if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = "Enter valid email";
+    if (!form.password.trim()) newErrors.password = "Password is required";
+    if (form.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-
     if (!validate()) return;
+    await signup();
 
-    alert(`Signed up as: ${form.name}\nEmail: ${form.email}`);
   };
 
   return (
@@ -86,7 +101,6 @@ export default function Signup() {
           Sign Up
         </button>
 
-        {/* 👉 Bottom Link */}
         <p style={styles.bottomText}>
           Already have an account?{" "}
           <Link to="/" style={styles.link}>
@@ -144,13 +158,9 @@ const styles = {
   },
   bottomText: {
     textAlign: "center",
-    marginTop: "10px",
-    fontSize: "14px",
   },
   link: {
     color: "#0077ff",
-    textDecoration: "none",
     fontWeight: "bold",
-    cursor: "pointer",
   },
 };
