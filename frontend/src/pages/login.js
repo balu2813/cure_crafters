@@ -1,10 +1,38 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from 'axios';
+import { UserContext } from "../context/userContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const { updateUser } = useContext(UserContext);
+  const navigate = useNavigate();
+
+  const LoginUser = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/api/auth/login", {
+        email,
+        password,
+      });
+
+      const { token, user } = response.data;
+
+      if (token) {
+        localStorage.setItem("token", token);
+        updateUser(user);
+        navigate("/dashboard");
+      }
+
+    } catch (error) {
+      if (error.response && error.response.data.message) {
+        setErrors({ general: error.response.data.message });
+      } else {
+        setErrors({ general: "Something went wrong. Please try again." });
+      }
+    }
+  };
 
   const validate = () => {
     const newErrors = {};
@@ -25,12 +53,12 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    alert(`Logged in with Email: ${email}`);
+    await LoginUser();
   };
 
   return (
@@ -56,11 +84,13 @@ export default function Login() {
         />
         {errors.password && <p style={styles.error}>{errors.password}</p>}
 
+        {/* 🔥 Added General Error Message Here */}
+        {errors.general && <p style={styles.error}>{errors.general}</p>}
+
         <button style={styles.btn} type="submit">
           Login
         </button>
 
-        {/* 👉 Bottom Link */}
         <p style={styles.bottomText}>
           Don't have an account?{" "}
           <Link to="/signup" style={styles.link}>
