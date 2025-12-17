@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
+import Question from "./Question";
 
 export default function Dashboard() {
+  const [start, setStart] = useState(false);
+
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Welcome to Cure Crafters</h1>
-        <p style={styles.subtitle}>Your health companion starts here ✨</p>
+      {!start ? (
+        <div style={styles.card}>
+          <h1 style={styles.title}>Welcome to Cure Crafters</h1>
+          <p style={styles.subtitle}>Your health companion starts here ✨</p>
 
-        <button style={styles.button}>
-          Get Started
-        </button>
-      </div>
+          <button style={styles.button} onClick={() => setStart(true)}>
+            Get Started
+          </button>
+        </div>
+      ) : (
+        <div style={styles.questionWrapper}>
+          <Question />
+        </div>
+      )}
     </div>
   );
 }
@@ -22,7 +31,6 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    animation: "fadeIn 1.5s ease-in-out",
   },
 
   card: {
@@ -33,7 +41,6 @@ const styles = {
     borderRadius: "20px",
     backdropFilter: "blur(15px)",
     boxShadow: "0px 8px 25px rgba(0, 0, 0, 0.25)",
-    animation: "popUp 0.8s ease-out",
   },
 
   title: {
@@ -59,5 +66,9 @@ const styles = {
     fontWeight: "bold",
     cursor: "pointer",
     transition: "0.3s",
+  },
+
+  questionWrapper: {
+    width: "450px",
   },
 };

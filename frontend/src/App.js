@@ -8,6 +8,7 @@ import UserProvider from "./context/userContext";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
+import ScoreCard from "./pages/scorecard";
 function App() {
   return (
     <UserProvider>
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" exact element={<Login />} />
           <Route path="/signup" exact element={<Signup />} />
           <Route path="/dashboard" exact element={<Dashboard />} />
+          <Route path="/scorecard" exact element={<ScoreCard />} />
         </Routes>
     </Router>
     </UserProvider>
